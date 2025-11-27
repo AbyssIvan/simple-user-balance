@@ -58,7 +58,7 @@ class UserController extends Controller
 
         return response()->json([
             "user_id" => $user->id,
-            "balance" => $user->formatBalance(),
+            "balance" => $user->balance,
         ], JsonResponse::HTTP_OK);
     }
 }

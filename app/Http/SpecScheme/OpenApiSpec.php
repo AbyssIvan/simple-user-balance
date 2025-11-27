@@ -21,7 +21,7 @@ use OpenApi\Attributes as OA;
             content: new OA\JsonContent(type: 'array', items: new OA\Items(properties: [
                 new OA\Property(property: 'id', type: 'integer', example: 2),
                 new OA\Property(property: 'name', type: 'string', example: 'Some name'),
-                new OA\Property(property: 'balance', type: 'float', example: 321.12),
+                new OA\Property(property: 'balance', type: 'integer', example: 32112),
                 new OA\Property(property: 'createdAt', type: 'string', example: '05.11.2025 13:15:42'),
                 new OA\Property(property: 'updatedAt', type: 'string', example: '06.11.2025 15:15:42'),
             ]))
@@ -55,7 +55,7 @@ use OpenApi\Attributes as OA;
             content: new OA\JsonContent(type: 'object', properties: [
                 new OA\Property(property: 'id', type: 'integer', example: 2),
                 new OA\Property(property: 'name', type: 'string', example: 'Some name'),
-                new OA\Property(property: 'balance', type: 'float', example: 321.12),
+                new OA\Property(property: 'balance', type: 'integer', example: 32112),
                 new OA\Property(property: 'createdAt', type: 'string', example: '05.11.2025 13:15:42'),
                 new OA\Property(property: 'updatedAt', type: 'string', example: '06.11.2025 15:15:42'),
             ])
@@ -102,7 +102,7 @@ use OpenApi\Attributes as OA;
             description: 'Success response',
             content: new OA\JsonContent(type: 'object', properties: [
                 new OA\Property(property: 'user_id', type: 'integer', example: 2),
-                new OA\Property(property: 'balance', type: 'float', example: 321.12),
+                new OA\Property(property: 'balance', type: 'integer', example: 32112),
             ])
         ),
     ]

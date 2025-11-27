@@ -19,7 +19,7 @@ class TransactionController extends Controller
         $user = User::findOrFail($request->validated('user_id'));
 
         DB::transaction(function () use ($user, $request) {
-            $amount = (int) ($request->validated('amount') * 100);
+            $amount = $request->validated('amount');
 
             $user->modifyBalance($amount);
             $user->transactions()->create([
@@ -38,7 +38,7 @@ class TransactionController extends Controller
         $user = User::findOrFail($request->validated('user_id'));
 
         DB::transaction(function () use ($user, $request) {
-            $amount = (int) ($request->validated('amount') * 100);
+            $amount = $request->validated('amount');
 
             $user->modifyBalance($amount * -1);
             $user->transactions()->create([
@@ -58,7 +58,7 @@ class TransactionController extends Controller
         $toUser = User::findOrFail($request->validated('to_user_id'));
 
         DB::transaction(function () use ($fromUser, $toUser, $request) {
-            $amount = (int) ($request->validated('amount') * 100);
+            $amount = $request->validated('amount');
 
             $fromUser->modifyBalance($amount * -1);
             $fromUser->transactions()->create([

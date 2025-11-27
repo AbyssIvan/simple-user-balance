@@ -43,9 +43,4 @@ final class User extends Model
 
         $this->balance += $amount;
     }
-
-    public function formatBalance() : float
-    {
-        return round($this->balance / 100, 2);
-    }
 }

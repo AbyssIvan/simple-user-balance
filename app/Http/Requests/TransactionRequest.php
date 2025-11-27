@@ -11,12 +11,12 @@ use OpenApi\Attributes as OA;
 #[OA\Schema(
     properties: [
         new OA\Property(property: 'user_id', description: 'User ID', type: 'integer', example: 1),
-        new OA\Property(property: 'amount', description: 'Transaction amount', type: 'float', example: 350.56),
+        new OA\Property(property: 'amount', description: 'Transaction amount', type: 'integer', example: 35056),
         new OA\Property(property: 'comment', description: 'Transaction comment', type: 'string', example: 'Transaction detail', nullable: true),
     ],
     example: [
         "user_id" => 1,
-        "amount"  => 350.56,
+        "amount"  => 35056,
         "comment" => 'Transaction detail',
     ]
 )]
@@ -31,7 +31,7 @@ class TransactionRequest extends FormRequest
     {
         return [
             'user_id' => 'required|integer',
-            'amount'  => 'required|numeric|min:0',
+            'amount'  => 'required|integer|min:0',
             'comment' => 'nullable|string',
         ];
     }
