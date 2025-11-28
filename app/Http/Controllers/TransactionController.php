@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Enum\TransactionType;
+use App\Events\TransactionEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TransactionRequest;
 use App\Http\Requests\TransferRequest;
@@ -18,17 +19,20 @@ class TransactionController extends Controller
     {
         $user = User::findOrFail($request->validated('user_id'));
 
-        DB::transaction(function () use ($user, $request) {
+        $transaction = DB::transaction(function () use ($user, $request) {
             $amount = $request->validated('amount');
 
             $user->modifyBalance($amount);
-            $user->transactions()->create([
+            $transaction = $user->transactions()->create([
                 'type'    => TransactionType::DEPOSIT,
                 'amount'  => $amount,
                 'comment' => $request->validated('comment'),
             ]);
             $user->save();
+            return $transaction;
         });
+
+        TransactionEvent::dispatch($transaction);
 
         return response()->json(['message' => 'User balance updated'], JsonResponse::HTTP_CREATED);
     }
@@ -37,17 +41,20 @@ class TransactionController extends Controller
     {
         $user = User::findOrFail($request->validated('user_id'));
 
-        DB::transaction(function () use ($user, $request) {
+        $transaction = DB::transaction(function () use ($user, $request) {
             $amount = $request->validated('amount');
 
             $user->modifyBalance($amount * -1);
-            $user->transactions()->create([
+            $transaction = $user->transactions()->create([
                 'type'    => TransactionType::WITHDRAW,
                 'amount'  => $amount,
                 'comment' => $request->validated('comment'),
             ]);
             $user->save();
+            return $transaction;
         });
+
+        TransactionEvent::dispatch($transaction);
 
         return response()->json(['message' => 'User balance updated'], JsonResponse::HTTP_CREATED);
     }
@@ -57,18 +64,18 @@ class TransactionController extends Controller
         $fromUser = User::findOrFail($request->validated('from_user_id'));
         $toUser = User::findOrFail($request->validated('to_user_id'));
 
-        DB::transaction(function () use ($fromUser, $toUser, $request) {
+        [$outTransaction, $inTransaction] = DB::transaction(function () use ($fromUser, $toUser, $request) {
             $amount = $request->validated('amount');
 
             $fromUser->modifyBalance($amount * -1);
-            $fromUser->transactions()->create([
+            $outTransaction = $fromUser->transactions()->create([
                 'type'    => TransactionType::TRANSFER_OUT,
                 'amount'  => $amount,
                 'comment' => $request->validated('comment'),
             ]);
 
             $toUser->modifyBalance($amount);
-            $toUser->transactions()->create([
+            $inTransaction = $toUser->transactions()->create([
                 'type'     => TransactionType::TRANSFER_IN,
                 'amount'   => $amount,
                 'payer_id' => $fromUser->id,
@@ -77,7 +84,12 @@ class TransactionController extends Controller
 
             $fromUser->save();
             $toUser->save();
+
+            return [$outTransaction, $inTransaction];
         });
+
+        TransactionEvent::dispatch($outTransaction);
+        TransactionEvent::dispatch($inTransaction);
 
         return response()->json(['message' => 'User balance updated'], JsonResponse::HTTP_CREATED);
     }
